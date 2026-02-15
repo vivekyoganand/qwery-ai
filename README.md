@@ -29,44 +29,30 @@ LLM generates answer
 ## Directory Structure
 
 ```
-qwery-ai-deployment/
+qwery-ai/
 ├── postgresql-pgvector/      # PostgreSQL with pgvector Helm chart
 │   ├── Chart.yaml
 │   ├── values.yaml
 │   └── templates/
-│       ├── _helpers.tpl
-│       ├── deployment.yaml
-│       ├── service.yaml
-│       ├── secret.yaml
-│       ├── pvc.yaml
-│       ├── configmap.yaml
-│       └── NOTES.txt
 ├── ollama/                    # Ollama Helm chart
 │   ├── Chart.yaml
 │   ├── values.yaml
 │   └── templates/
-│       ├── _helpers.tpl
-│       ├── deployment.yaml
-│       ├── service.yaml
-│       ├── pvc.yaml
-│       └── NOTES.txt
 ├── qwery-ai/                  # Qwery AI Helm chart
 │   ├── Chart.yaml
 │   ├── values.yaml
 │   ├── values-dev.yaml
 │   ├── values-prod.yaml
 │   └── templates/
-│       ├── _helpers.tpl
-│       ├── deployment.yaml
-│       ├── service.yaml
-│       ├── route.yaml
-│       ├── configmap.yaml
-│       ├── secret.yaml
-│       ├── hpa.yaml
-│       ├── networkpolicy.yaml
-│       └── NOTES.txt
+├── etl/                       # ← ETL Pipeline (ADDED)
+│   ├── etl_load_pgvector.py
+│   ├── requirements.txt
+│   └── README.md
+├── app.py                     # Sample Qwery AI application
+├── Dockerfile                 # Container build file
+├── requirements.txt           # Python dependencies
 ├── install.sh                 # Automated installation script
-└── README.md                  # This file
+└── README.md                  # Documentation
 ```
 
 ## Prerequisites
