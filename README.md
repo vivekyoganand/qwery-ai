@@ -30,29 +30,18 @@ LLM generates answer
 
 ```
 qwery-ai/
-├── postgresql-pgvector/      # PostgreSQL with pgvector Helm chart
-│   ├── Chart.yaml
-│   ├── values.yaml
-│   └── templates/
-├── ollama/                    # Ollama Helm chart
-│   ├── Chart.yaml
-│   ├── values.yaml
-│   └── templates/
-├── qwery-ai/                  # Qwery AI Helm chart
-│   ├── Chart.yaml
-│   ├── values.yaml
-│   ├── values-dev.yaml
-│   ├── values-prod.yaml
-│   └── templates/
-├── etl/                       # ← ETL Pipeline (ADDED)
+├── postgresql-pgvector/       ✅ Helm chart
+├── ollama/                    ✅ Helm chart  
+├── qwery-ai/                  ✅ Helm chart
+├── etl/                       ✅ ETL pipeline (PRESENT!)
 │   ├── etl_load_pgvector.py
 │   ├── requirements.txt
 │   └── README.md
-├── app.py                     # Sample Qwery AI application
-├── Dockerfile                 # Container build file
-├── requirements.txt           # Python dependencies
-├── install.sh                 # Automated installation script
-└── README.md                  # Documentation
+├── app.py                     ✅ Sample app
+├── Dockerfile                 ✅ Container build
+├── requirements.txt           ✅ Dependencies
+├── install.sh                 ✅ Install script
+└── README.md                  ✅ Documentation
 ```
 
 ## Prerequisites
