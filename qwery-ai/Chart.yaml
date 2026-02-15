@@ -1,0 +1,16 @@
+apiVersion: v2
+name: qwery-ai
+description: Qwery AI RAG Service with vector similarity search
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - ai
+  - rag
+  - vector-search
+  - llm
+  - openshift-ai
+dependencies: []
+maintainers:
+  - name: Platform Engineering Team
+    email: platform@example.com

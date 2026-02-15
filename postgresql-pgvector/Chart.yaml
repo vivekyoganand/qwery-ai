@@ -1,0 +1,15 @@
+apiVersion: v2
+name: postgresql-pgvector
+description: PostgreSQL with pgvector extension for vector similarity search
+type: application
+version: 1.0.0
+appVersion: "16"
+keywords:
+  - postgresql
+  - pgvector
+  - vector-database
+  - ai
+  - ml
+maintainers:
+  - name: Platform Engineering Team
+    email: platform@example.com

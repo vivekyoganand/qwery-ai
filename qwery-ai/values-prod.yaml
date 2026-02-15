@@ -1,0 +1,32 @@
+# Production environment values
+replicaCount: 3
+
+image:
+  tag: "v1.0.0"
+  pullPolicy: IfNotPresent
+
+resources:
+  requests:
+    memory: "4Gi"
+    cpu: "2"
+  limits:
+    memory: "8Gi"
+    cpu: "4"
+
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 20
+  targetCPUUtilizationPercentage: 60
+  targetMemoryUtilizationPercentage: 70
+
+config:
+  app:
+    logLevel: "INFO"
+    workers: 8
+
+route:
+  host: "qwery-ai.apps.ocp4.example.com"
+
+serviceMonitor:
+  enabled: true

@@ -1,0 +1,70 @@
+# Default values for ollama
+
+replicaCount: 1
+
+image:
+  repository: ollama/ollama
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+nameOverride: ""
+fullnameOverride: "ollama"
+
+service:
+  type: ClusterIP
+  port: 11434
+
+# Models to download on startup
+models:
+  - llama2
+  - nomic-embed-text
+
+persistence:
+  enabled: true
+  storageClass: "netapp-file-standard"
+  accessMode: ReadWriteOnce
+  size: 50Gi
+  mountPath: /root/.ollama
+
+resources:
+  requests:
+    memory: "4Gi"
+    cpu: "2"
+  limits:
+    memory: "8Gi"
+    cpu: "4"
+
+# Security context
+securityContext:
+  runAsUser: 0  # Ollama requires root
+  runAsNonRoot: false
+
+# Liveness and readiness probes
+livenessProbe:
+  enabled: true
+  httpGet:
+    path: /
+    port: 11434
+  initialDelaySeconds: 60
+  periodSeconds: 30
+  timeoutSeconds: 10
+  failureThreshold: 3
+
+readinessProbe:
+  enabled: true
+  httpGet:
+    path: /
+    port: 11434
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+# Node selector
+nodeSelector: {}
+
+# Tolerations
+tolerations: []
+
+# Affinity
+affinity: {}

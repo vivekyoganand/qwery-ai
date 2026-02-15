@@ -1,0 +1,25 @@
+# Development environment values
+replicaCount: 1
+
+image:
+  tag: "dev"
+  pullPolicy: Always
+
+resources:
+  requests:
+    memory: "1Gi"
+    cpu: "500m"
+  limits:
+    memory: "2Gi"
+    cpu: "1"
+
+autoscaling:
+  enabled: false
+
+config:
+  app:
+    logLevel: "DEBUG"
+    workers: 2
+
+route:
+  host: "qwery-ai-dev.apps.ocp4.example.com"

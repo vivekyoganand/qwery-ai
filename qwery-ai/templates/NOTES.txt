@@ -1,0 +1,40 @@
+Thank you for installing {{ .Chart.Name }}!
+
+Your Qwery AI RAG Service has been deployed.
+
+1. Get the application URL:
+
+{{- if .Values.route.enabled }}
+   export ROUTE_HOST=$(oc get route {{ include "qwery-ai.fullname" . }} -o jsonpath='{.spec.host}')
+   echo "Qwery AI URL: https://$ROUTE_HOST"
+{{- else }}
+   export POD_NAME=$(oc get pods -l "app.kubernetes.io/name={{ include "qwery-ai.name" . }},app.kubernetes.io/instance={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}")
+   oc port-forward $POD_NAME 8000:8000
+   echo "Visit http://127.0.0.1:8000 to use your application"
+{{- end }}
+
+2. Check the deployment status:
+
+   oc get pods -l app.kubernetes.io/name={{ include "qwery-ai.name" . }}
+
+3. View application logs:
+
+   oc logs -f deployment/{{ include "qwery-ai.fullname" . }}
+
+4. Test the health endpoint:
+
+   curl -k https://$ROUTE_HOST/health
+
+5. Test document ingestion:
+
+   curl -k -X POST https://$ROUTE_HOST/api/documents \
+     -H "Content-Type: application/json" \
+     -d '{"content": "Test document", "metadata": {"source": "test"}}'
+
+6. Test vector search:
+
+   curl -k -X POST https://$ROUTE_HOST/api/search \
+     -H "Content-Type: application/json" \
+     -d '{"query": "test", "limit": 5}'
+
+For more information and API documentation, visit: https://$ROUTE_HOST/docs

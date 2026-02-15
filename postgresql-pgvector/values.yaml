@@ -1,0 +1,134 @@
+# Default values for postgresql-pgvector
+
+replicaCount: 1
+
+image:
+  repository: ankane/pgvector
+  tag: "v0.5.1"
+  pullPolicy: IfNotPresent
+
+nameOverride: ""
+fullnameOverride: "postgresql-pgvector"
+
+service:
+  type: ClusterIP
+  port: 5432
+
+postgresql:
+  database: vectordb
+  username: qweryai
+  password: "ChangeMe123!"  # Change this in production
+  postgresPassword: "PostgresAdmin123!"  # Change this in production
+
+persistence:
+  enabled: true
+  storageClass: "netapp-file-standard"  # Change to your storage class
+  accessMode: ReadWriteOnce
+  size: 100Gi
+  mountPath: /var/lib/postgresql/data
+
+resources:
+  requests:
+    memory: "4Gi"
+    cpu: "2"
+  limits:
+    memory: "8Gi"
+    cpu: "4"
+
+# PostgreSQL configuration
+postgresqlConfig:
+  max_connections: "200"
+  shared_buffers: "1GB"
+  effective_cache_size: "3GB"
+  maintenance_work_mem: "256MB"
+  checkpoint_completion_target: "0.9"
+  wal_buffers: "16MB"
+  default_statistics_target: "100"
+  random_page_cost: "1.1"
+  effective_io_concurrency: "200"
+  work_mem: "5242kB"
+  min_wal_size: "1GB"
+  max_wal_size: "4GB"
+
+# pgvector specific settings
+pgvectorConfig:
+  # Enable pgvector extension
+  enableExtension: true
+  # Vector dimensions (adjust based on your embedding model)
+  vectorDimensions: 1536
+
+# Init scripts
+initScripts:
+  01-init-db.sql: |
+    -- Create database if not exists
+    SELECT 'CREATE DATABASE vectordb' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'vectordb')\gexec
+
+    -- Connect to vectordb
+    \c vectordb;
+
+    -- Create pgvector extension
+    CREATE EXTENSION IF NOT EXISTS vector;
+
+    -- Create documents table
+    CREATE TABLE IF NOT EXISTS documents (
+        id BIGSERIAL PRIMARY KEY,
+        content TEXT NOT NULL,
+        embedding vector(1536),
+        metadata JSONB,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+
+    -- Create index for vector similarity search
+    CREATE INDEX IF NOT EXISTS documents_embedding_idx ON documents 
+    USING ivfflat (embedding vector_cosine_ops) WITH (lists = 100);
+
+    -- Create index on metadata
+    CREATE INDEX IF NOT EXISTS documents_metadata_idx ON documents USING GIN (metadata);
+
+    -- Create index on created_at
+    CREATE INDEX IF NOT EXISTS documents_created_at_idx ON documents (created_at DESC);
+
+    -- Grant permissions
+    GRANT ALL PRIVILEGES ON DATABASE vectordb TO qweryai;
+    GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO qweryai;
+    GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO qweryai;
+
+# Security context
+securityContext:
+  runAsUser: 999
+  runAsGroup: 999
+  fsGroup: 999
+  runAsNonRoot: true
+
+# Pod security context
+podSecurityContext:
+  fsGroup: 999
+
+# Liveness and readiness probes
+livenessProbe:
+  enabled: true
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 6
+  successThreshold: 1
+
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 5
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 6
+  successThreshold: 1
+
+# Service monitor for Prometheus
+serviceMonitor:
+  enabled: false
+  interval: 30s
+
+# Backup configuration
+backup:
+  enabled: true
+  schedule: "0 2 * * *"  # Daily at 2 AM
+  retention: 7  # Keep 7 days of backups

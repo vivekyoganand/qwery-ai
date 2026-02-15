@@ -1,0 +1,158 @@
+# Default values for qwery-ai
+
+replicaCount: 2
+
+image:
+  repository: quay.io/your-org/qwery-ai  # Change to your image repository
+  tag: "latest"
+  pullPolicy: Always
+
+nameOverride: ""
+fullnameOverride: "qwery-ai"
+
+service:
+  type: ClusterIP
+  port: 8000
+  targetPort: 8000
+
+route:
+  enabled: true
+  host: ""  # Leave empty for auto-generation
+  tls:
+    enabled: true
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+
+# Application configuration
+config:
+  # PostgreSQL connection
+  postgres:
+    host: "postgresql-pgvector"
+    port: "5432"
+    database: "vectordb"
+    username: "qweryai"
+    # Password will be read from secret
+
+  # Embedding model configuration
+  embedding:
+    provider: "ollama"  # Options: ollama, huggingface, openai
+    modelUrl: "http://ollama:11434"
+    modelName: "llama2"
+    dimensions: 1536
+
+  # RAG configuration
+  rag:
+    topK: 5
+    similarityThreshold: 0.7
+    maxContextLength: 2000
+
+  # Application settings
+  app:
+    logLevel: "INFO"
+    workers: 4
+    timeout: 60
+
+resources:
+  requests:
+    memory: "2Gi"
+    cpu: "1"
+  limits:
+    memory: "4Gi"
+    cpu: "2"
+
+# Horizontal Pod Autoscaler
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+# Security context
+securityContext:
+  runAsUser: 1001
+  runAsGroup: 1001
+  fsGroup: 1001
+  runAsNonRoot: true
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+    - ALL
+
+# Pod security context
+podSecurityContext:
+  fsGroup: 1001
+
+# Liveness and readiness probes
+livenessProbe:
+  enabled: true
+  httpGet:
+    path: /health
+    port: 8000
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+  successThreshold: 1
+
+readinessProbe:
+  enabled: true
+  httpGet:
+    path: /ready
+    port: 8000
+  initialDelaySeconds: 10
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 3
+  successThreshold: 1
+
+# Service monitor for Prometheus
+serviceMonitor:
+  enabled: false
+  interval: 30s
+  path: /metrics
+
+# Network policy
+networkPolicy:
+  enabled: true
+  ingress:
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            name: openshift-ingress
+  egress:
+    - to:
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: postgresql-pgvector
+      ports:
+      - protocol: TCP
+        port: 5432
+    - to:
+      - podSelector:
+          matchLabels:
+            app.kubernetes.io/name: ollama
+      ports:
+      - protocol: TCP
+        port: 11434
+
+# Environment variables
+env:
+  - name: PYTHONUNBUFFERED
+    value: "1"
+  - name: APP_ENV
+    value: "production"
+
+# Additional environment variables from secrets
+envFrom:
+  - secretRef:
+      name: qwery-ai-secret
+
+# Node selector
+nodeSelector: {}
+
+# Tolerations
+tolerations: []
+
+# Affinity
+affinity: {}

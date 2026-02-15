@@ -1,0 +1,14 @@
+apiVersion: v2
+name: ollama
+description: Ollama - Local LLM and embedding model server
+type: application
+version: 1.0.0
+appVersion: "0.1.26"
+keywords:
+  - ollama
+  - llm
+  - embedding
+  - ai
+maintainers:
+  - name: Platform Engineering Team
+    email: platform@example.com

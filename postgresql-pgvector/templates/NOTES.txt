@@ -1,0 +1,21 @@
+Thank you for installing {{ .Chart.Name }}!
+
+Your PostgreSQL with pgvector has been deployed.
+
+1. Get the PostgreSQL password:
+
+   export POSTGRES_PASSWORD=$(oc get secret {{ include "postgresql-pgvector.fullname" . }}-secret -o jsonpath="{.data.password}" | base64 -d)
+
+2. Connect to PostgreSQL from within the cluster:
+
+   oc run postgresql-client --rm --tty -i --restart='Never' --image=postgres:16 --env="PGPASSWORD=$POSTGRES_PASSWORD" --command -- psql -h {{ include "postgresql-pgvector.fullname" . }} -U {{ .Values.postgresql.username }} -d {{ .Values.postgresql.database }}
+
+3. Test pgvector extension:
+
+   oc exec -it deployment/{{ include "postgresql-pgvector.fullname" . }} -- psql -U {{ .Values.postgresql.username }} -d {{ .Values.postgresql.database }} -c "SELECT * FROM pg_extension WHERE extname='vector';"
+
+4. Check deployment status:
+
+   oc get pods -l app.kubernetes.io/name={{ include "postgresql-pgvector.name" . }}
+
+For more information, visit: https://github.com/pgvector/pgvector

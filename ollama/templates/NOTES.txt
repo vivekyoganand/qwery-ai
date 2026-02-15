@@ -1,0 +1,33 @@
+Thank you for installing {{ .Chart.Name }}!
+
+Your Ollama server has been deployed.
+
+1. Check the deployment status:
+
+   oc get pods -l app.kubernetes.io/name={{ include "ollama.name" . }}
+
+2. Wait for models to download (this may take several minutes):
+
+   oc logs -f deployment/{{ include "ollama.fullname" . }} -c model-downloader
+
+3. Test Ollama service:
+
+   export POD_NAME=$(oc get pods -l "app.kubernetes.io/name={{ include "ollama.name" . }}" -o jsonpath="{.items[0].metadata.name}")
+   oc exec -it $POD_NAME -- ollama list
+
+4. Test embedding generation:
+
+   oc exec -it $POD_NAME -- curl -X POST http://localhost:11434/api/embeddings \
+     -H "Content-Type: application/json" \
+     -d '{"model": "llama2", "prompt": "Hello world"}'
+
+5. Access Ollama from other pods:
+
+   Service URL: http://{{ include "ollama.fullname" . }}:{{ .Values.service.port }}
+
+Models installed:
+{{- range .Values.models }}
+  - {{ . }}
+{{- end }}
+
+For more information, visit: https://ollama.ai

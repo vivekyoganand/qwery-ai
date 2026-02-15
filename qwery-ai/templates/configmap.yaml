@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "qwery-ai.fullname" . }}-config
+  labels:
+    {{- include "qwery-ai.labels" . | nindent 4 }}
+data:
+  app-config.yaml: |
+    postgres:
+      host: {{ .Values.config.postgres.host }}
+      port: {{ .Values.config.postgres.port }}
+      database: {{ .Values.config.postgres.database }}
+      username: {{ .Values.config.postgres.username }}
+
+    embedding:
+      provider: {{ .Values.config.embedding.provider }}
+      model_url: {{ .Values.config.embedding.modelUrl }}
+      model_name: {{ .Values.config.embedding.modelName }}
+      dimensions: {{ .Values.config.embedding.dimensions }}
+
+    rag:
+      top_k: {{ .Values.config.rag.topK }}
+      similarity_threshold: {{ .Values.config.rag.similarityThreshold }}
+      max_context_length: {{ .Values.config.rag.maxContextLength }}
+
+    app:
+      log_level: {{ .Values.config.app.logLevel }}
+      workers: {{ .Values.config.app.workers }}
+      timeout: {{ .Values.config.app.timeout }}
