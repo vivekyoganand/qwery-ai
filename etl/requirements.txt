@@ -1,0 +1,6 @@
+# ETL Requirements for pgvector data loading
+psycopg2-binary==2.9.9
+sentence-transformers==2.2.2
+numpy==1.24.3
+torch==2.1.0
+transformers==4.35.0
